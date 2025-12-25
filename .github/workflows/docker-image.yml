@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/go-app
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/golang_docker
 
 jobs:
   build-and-test:
@@ -30,7 +30,7 @@ jobs:
 
       # Шаг 4: Тестирование конкретного файла
       - name: Test
-        run: go test -v main.go   # без ./..., для проектов без go.mod
+        run: go test -v main.go   # заменяем ./... на конкретный файл
 
       # Шаг 5: Логин в GitHub Container Registry
       - name: Log in to GitHub Container Registry
@@ -38,7 +38,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}  # Используй PAT с правами write:packages
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # Шаг 6: Сборка Docker образа
       - name: Build Docker image
@@ -61,12 +61,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # Останавливаем старый контейнер (если есть)
-            docker stop go-app || true
-            docker rm go-app || true
-
-            # Обновляем образ
             docker pull $IMAGE_NAME:latest
-
-            # Запускаем контейнер с фиксированным именем go-app
-            docker run -d --name go-app -p 9990:9990 $IMAGE_NAME:latest
+            docker stop golang_docker || true
+            docker rm golang_docker || true
+            docker run -d --name golang_docker -p 9990:9990 $IMAGE_NAME:latest
