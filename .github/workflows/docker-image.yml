@@ -22,6 +22,10 @@ jobs:
         with:
           go-version: 1.21
 
+      - name: Enable Go Modules
+        run: |
+          go env -w GO111MODULE=on
+
       - name: Build
         run: go build -o app main.go
 
@@ -36,12 +40,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
-        run: |
-          docker build -t $IMAGE_NAME:latest .
+        run: docker build -t $IMAGE_NAME:latest .
 
       - name: Push Docker image
-        run: |
-          docker push $IMAGE_NAME:latest
+        run: docker push $IMAGE_NAME:latest
 
   deploy:
     name: Deploy to Server
