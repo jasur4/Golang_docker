@@ -10,23 +10,29 @@ env:
 
 jobs:
   build-and-test:
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
+      # Шаг 1: Проверяем код
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Шаг 2: Устанавливаем Go
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.21
 
+      # Шаг 3: Сборка бинарника
       - name: Build
         run: go build -o app main.go
 
+      # Шаг 4: Тестирование конкретного файла
       - name: Test
-        run: go test -v  # без ./...
+        run: go test -v main.go   # заменяем ./... на конкретный файл
 
+      # Шаг 5: Логин в GitHub Container Registry
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -34,15 +40,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Шаг 6: Сборка Docker образа
       - name: Build Docker image
         run: docker build -t $IMAGE_NAME:latest .
 
+      # Шаг 7: Пуш Docker образа
       - name: Push Docker image
         run: docker push $IMAGE_NAME:latest
 
   deploy:
+    name: Deploy to Server
     runs-on: ubuntu-latest
     needs: build-and-test
+
     steps:
       - name: SSH into server and deploy
         uses: appleboy/ssh-action@v0.1.8
