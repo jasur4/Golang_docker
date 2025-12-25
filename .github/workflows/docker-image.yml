@@ -61,7 +61,14 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            docker pull $IMAGE_NAME:latest
-            docker stop golang_docker || true
-            docker rm golang_docker || true
-            docker run -d --name golang_docker -p 9990:9990 $IMAGE_NAME:latest
+            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/golang_docker:latest
+
+            # Останавливаем старый контейнер (если есть)
+            docker stop go-app || true
+            docker rm go-app || true
+
+            # Обновляем образ
+            docker pull $IMAGE_NAME
+
+            # Запускаем контейнер с фиксированным именем go-app
+            docker run -d --name go-app -p 9990:9990 $IMAGE_NAME
