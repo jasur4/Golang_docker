@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/go-app:latest
+            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/golang_docker:latest
 
             # Удаляем все контейнеры на порту 9990
             PORT_CONFLICT=$(docker ps -q --filter "publish=9990")
